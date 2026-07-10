@@ -5,7 +5,7 @@ from app.api.health import router as health_router
 from app.logging.logger import logger
 from app.core.settings import settings
 from app.core.lifespan import lifespan
-
+from app.api.auth import router as auth_router
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -17,5 +17,5 @@ logger.info("Starting AI AppSec Assistant")
 
 app.include_router(root_router)
 app.include_router(health_router)
-
+app.include_router(auth_router)
 # uvicorn app.main:app --reload
