@@ -1,8 +1,9 @@
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.user import User
-from sqlalchemy.exc import IntegrityError
+
 
 class UserRepository:
 
@@ -11,6 +12,7 @@ class UserRepository:
         db: Session,
         email: str,
     ) -> User | None:
+
         statement = select(User).where(User.email == email)
 
         result = db.execute(statement)
@@ -18,24 +20,22 @@ class UserRepository:
         return result.scalar_one_or_none()
 
     def create(
-    self,
-    db: Session,
-    username: str,
-    email: str,
-    hashed_password: str,
+        self,
+        db: Session,
+        username: str,
+        email: str,
+        hashed_password: str,
     ) -> User:
 
         user = User(
-        username=username,
-        email=email,
-        hashed_password=hashed_password,
+            username=username,
+            email=email,
+            hashed_password=hashed_password,
         )
 
         try:
             db.add(user)
-
             db.commit()
-
             db.refresh(user)
 
             return user
@@ -43,3 +43,14 @@ class UserRepository:
         except IntegrityError:
             db.rollback()
             raise
+    def get_by_id(
+        self,
+        db: Session,
+        user_id: int,
+    ) -> User | None:
+
+        statement = select(User).where(User.id == user_id)
+
+        result = db.execute(statement)
+
+        return result.scalar_one_or_none()
