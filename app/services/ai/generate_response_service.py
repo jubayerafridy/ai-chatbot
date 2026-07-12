@@ -15,31 +15,40 @@ class GenerateResponseService:
     async def execute(
         self,
         messages: list[Message],
+        context: str | None = None,
     ) -> str:
 
         chat_messages = self.builder.build(
-            messages,
+            messages=messages,
+            context=context,
         )
 
         try:
+
             return await self.client.generate(
                 messages=chat_messages,
             )
 
         except httpx.ConnectError:
+
             raise HTTPException(
                 status_code=503,
                 detail="AI service is unavailable.",
             )
 
         except httpx.TimeoutException:
+
             raise HTTPException(
                 status_code=504,
                 detail="AI service timed out.",
             )
 
         except httpx.HTTPStatusError as exc:
+
             raise HTTPException(
                 status_code=502,
-                detail=f"AI provider returned HTTP {exc.response.status_code}.",
+                detail=(
+                    f"AI provider returned HTTP "
+                    f"{exc.response.status_code}."
+                ),
             )
