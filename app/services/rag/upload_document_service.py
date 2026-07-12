@@ -9,6 +9,9 @@ from app.repositories.document_repository import DocumentRepository
 from app.services.storage.local_storage_service import (
     LocalStorageService,
 )
+from app.services.rag.process_document_service import (
+    ProcessDocumentService,
+)
 
 
 class UploadDocumentService:
@@ -22,6 +25,9 @@ class UploadDocumentService:
     def __init__(self):
         self.document_repository = DocumentRepository()
         self.storage_service = LocalStorageService()
+        self.process_document_service = (
+            ProcessDocumentService()
+    )
 
     def execute(
         self,
@@ -63,6 +69,13 @@ class UploadDocumentService:
 
         try:
             db.commit()
+            db.refresh(document)
+
+            self.process_document_service.execute(
+                    db=db,
+                    document=document,
+                )
+
             db.refresh(document)
 
         except Exception:
