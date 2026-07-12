@@ -22,6 +22,8 @@ class Settings(BaseSettings):
 
     OLLAMA_TIMEOUT: int = 120
 
+    MAX_HISTORY_MESSAGES: int = 20
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore"

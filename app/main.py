@@ -9,7 +9,9 @@ from app.api.auth import router as auth_router
 from app.api.users import router as users_router
 from app.api.chats import router as chats_router
 from app.api.llm import router as llm_router
-
+from app.api.documents import (
+    router as document_router,
+)
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -25,6 +27,8 @@ app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(chats_router)
 app.include_router(llm_router)
-
+app.include_router(
+    document_router,
+)
 
 # uvicorn app.main:app --reload

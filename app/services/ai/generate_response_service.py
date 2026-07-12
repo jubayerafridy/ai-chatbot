@@ -1,3 +1,6 @@
+import httpx
+from fastapi import HTTPException
+
 from app.integrations.llm.ollama_client import OllamaClient
 from app.models.message import Message
 from app.prompt.prompt_builder import PromptBuilder
@@ -13,12 +16,30 @@ class GenerateResponseService:
         self,
         messages: list[Message],
     ) -> str:
-        # Build structured chat messages
+
         chat_messages = self.builder.build(
             messages,
         )
 
-        # Send them to the LLM
-        return await self.client.generate(
-            messages=chat_messages,
-        )
+        try:
+            return await self.client.generate(
+                messages=chat_messages,
+            )
+
+        except httpx.ConnectError:
+            raise HTTPException(
+                status_code=503,
+                detail="AI service is unavailable.",
+            )
+
+        except httpx.TimeoutException:
+            raise HTTPException(
+                status_code=504,
+                detail="AI service timed out.",
+            )
+
+        except httpx.HTTPStatusError as exc:
+            raise HTTPException(
+                status_code=502,
+                detail=f"AI provider returned HTTP {exc.response.status_code}.",
+            )
