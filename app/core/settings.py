@@ -24,6 +24,9 @@ class Settings(BaseSettings):
 
     MAX_HISTORY_MESSAGES: int = 20
 
+    QDRANT_URL: str
+    QDRANT_COLLECTION: str
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore"
