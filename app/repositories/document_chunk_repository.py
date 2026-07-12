@@ -35,3 +35,25 @@ class DocumentChunkRepository:
         result = db.execute(statement)
 
         return list(result.scalars().all())
+    
+    def get_by_document(
+        self,
+        db: Session,
+        document_id: int,
+    ) -> list[DocumentChunk]:
+
+        statement = (
+            select(DocumentChunk)
+            .where(
+                DocumentChunk.document_id == document_id
+            )
+            .order_by(
+                DocumentChunk.chunk_index
+            )
+        )
+
+        result = db.execute(statement)
+
+        return list(
+            result.scalars().all()
+        )
