@@ -9,7 +9,7 @@ service = IndexDocumentService()
 
 service.execute(
     db=db,
-    document_id=3,
+    document_id=36,
 )
 
 print("Document indexed successfully!")

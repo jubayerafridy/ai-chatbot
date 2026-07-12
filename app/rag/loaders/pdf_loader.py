@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from pypdf import PdfReader
+import fitz
 
 
 class PDFLoader:
@@ -10,15 +10,18 @@ class PDFLoader:
         path: Path,
     ) -> str:
 
-        reader = PdfReader(path)
+        document = fitz.open(path)
 
         pages: list[str] = []
 
-        for page in reader.pages:
+        for page in document:
 
-            text = page.extract_text()
+            text = page.get_text()
 
-            if text:
+            if text.strip():
+
                 pages.append(text)
+
+        document.close()
 
         return "\n\n".join(pages)
