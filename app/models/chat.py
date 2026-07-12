@@ -1,40 +1,35 @@
 from __future__ import annotations
+
 from datetime import datetime
 
-from sqlalchemy import DateTime, String, func
+from sqlalchemy import DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from app.models.chat import Chat
+    from app.models.user import User
+    from app.models.message import Message
 
-class User(Base):
-    __tablename__ = "users"
+class Chat(Base):
+    __tablename__ = "chat_sessions"
 
     id: Mapped[int] = mapped_column(
         primary_key=True,
         index=True,
     )
 
-    username: Mapped[str] = mapped_column(
-        String(50),
-        unique=True,
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"),
         nullable=False,
         index=True,
     )
 
-    email: Mapped[str] = mapped_column(
-        String(255),
-        unique=True,
-        nullable=False,
-        index=True,
-    )
-
-    hashed_password: Mapped[str] = mapped_column(
+    title: Mapped[str] = mapped_column(
         String(255),
         nullable=False,
+        default="New Chat",
     )
 
     created_at: Mapped[datetime] = mapped_column(
@@ -42,7 +37,11 @@ class User(Base):
         server_default=func.now(),
     )
 
-    chat_sessions: Mapped[list["Chat"]] = relationship(
-    back_populates="user",
-    cascade="all, delete-orphan",
+    user: Mapped["User"] = relationship(
+        back_populates="chat_sessions",
     )
+
+    messages: Mapped[list["Message"]] = relationship(
+    back_populates="chat",
+    cascade="all, delete-orphan",
+)
