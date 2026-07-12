@@ -52,3 +52,20 @@ class DocumentRepository:
         result = db.execute(statement)
 
         return list(result.scalars().all())
+    
+    def update_status(
+        self,
+        db: Session,
+        document: Document,
+        status,
+    ):
+
+        document.status = status
+
+        db.add(document)
+
+        db.commit()
+
+        db.refresh(document)
+
+        return document
