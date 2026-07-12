@@ -1,7 +1,9 @@
 import httpx
 from fastapi import HTTPException
 
-from app.integrations.llm.ollama_client import OllamaClient
+from app.integrations.langchain.chat_model import (
+    LangChainChatModel,
+)
 from app.models.message import Message
 from app.prompt.prompt_builder import PromptBuilder
 
@@ -9,8 +11,14 @@ from app.prompt.prompt_builder import PromptBuilder
 class GenerateResponseService:
 
     def __init__(self):
-        self.client = OllamaClient()
-        self.builder = PromptBuilder()
+
+        self.client = (
+            LangChainChatModel()
+        )
+
+        self.builder = (
+            PromptBuilder()
+        )
 
     async def execute(
         self,
