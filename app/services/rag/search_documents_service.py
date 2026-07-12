@@ -4,6 +4,7 @@ from app.rag.embeddings.sentence_transformer_service import (
 from app.rag.vectorstores.qdrant_service import (
     QdrantVectorStore,
 )
+from app.schemas.rag import RetrievedChunk
 
 
 class SearchDocumentsService:
@@ -22,13 +23,30 @@ class SearchDocumentsService:
         self,
         question: str,
         limit: int = 5,
-    ):
+        document_ids: list[int] | None = None,
+    ) -> list[RetrievedChunk]:
 
         vector = self.embedding_service.embed(
             question,
         )
 
-        return self.vector_store.search(
+        results = self.vector_store.search(
             vector=vector,
             limit=limit,
+            document_ids=document_ids,
         )
+
+        chunks: list[RetrievedChunk] = []
+
+        for point in results:
+
+            chunks.append(
+                RetrievedChunk(
+                    document_id=point.payload["document_id"],
+                    chunk_index=point.payload["chunk_index"],
+                    content=point.payload["content"],
+                    score=point.score,
+                )
+            )
+
+        return chunks

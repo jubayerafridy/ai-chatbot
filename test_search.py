@@ -5,7 +5,8 @@ from app.services.rag.search_documents_service import (
 service = SearchDocumentsService()
 
 results = service.execute(
-    "What experience does Jubayer have with FastAPI?"
+    question="What technologies does Jubayer know?",
+    document_ids=[36],   # your current document id
 )
 
 print(f"Found {len(results)} results\n")
@@ -13,13 +14,7 @@ print(f"Found {len(results)} results\n")
 for result in results:
 
     print("=" * 60)
-
     print(result.score)
-
     print()
-
-    print(
-        result.payload["content"][:300]
-    )
-
+    print(result.content[:300])
     print()
