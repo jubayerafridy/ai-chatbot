@@ -3,11 +3,14 @@ from langchain_core.tools import tool
 from app.services.tools.calculator_service import (
     CalculatorService,
 )
-
-
-calculator_service = (
-    CalculatorService()
+from app.services.tools.tool_executor import (
+    ToolExecutor,
 )
+
+
+calculator_service = CalculatorService()
+
+tool_executor = ToolExecutor()
 
 
 @tool
@@ -22,6 +25,8 @@ async def calculator(
     (10 * 5) + 8
     """
 
-    return calculator_service.execute(
-        expression,
+    return await tool_executor.execute(
+        tool_name="calculator",
+        executor=calculator_service.execute,
+        expression=expression,
     )

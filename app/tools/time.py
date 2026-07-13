@@ -3,17 +3,23 @@ from langchain_core.tools import tool
 from app.services.tools.time_service import (
     TimeService,
 )
-
-
-time_service = (
-    TimeService()
+from app.services.tools.tool_executor import (
+    ToolExecutor,
 )
+
+
+time_service = TimeService()
+
+tool_executor = ToolExecutor()
 
 
 @tool
 async def get_time() -> str:
     """
-    Return the current local date and time.
+    Returns the current local time.
     """
 
-    return time_service.execute()
+    return await tool_executor.execute(
+        tool_name="time",
+        executor=time_service.execute,
+    )
