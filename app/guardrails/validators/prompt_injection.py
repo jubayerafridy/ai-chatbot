@@ -2,15 +2,19 @@ class PromptInjectionValidator:
 
     BLOCKED_PATTERNS = [
 
-        "ignore previous instructions",
+        "ignore previous",
 
-        "forget previous instructions",
+    "ignore all previous",
 
-        "reveal system prompt",
+    "forget previous",
 
-        "show system prompt",
+    "forget all previous",
 
-        "developer message",
+    "reveal system",
+
+    "show system",
+
+    "developer message",
 
     ]
 

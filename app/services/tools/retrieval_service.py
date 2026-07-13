@@ -1,36 +1,22 @@
 from app.services.rag.search_documents_service import (
     SearchDocumentsService,
 )
-from app.tools.base.tool import BaseTool
 
 
-class RetrievalTool(BaseTool):
+class RetrievalService:
 
     def __init__(self):
 
-        self.search = (
+        self.search_service = (
             SearchDocumentsService()
         )
 
-    @property
-    def name(self) -> str:
-
-        return "retrieve_documents"
-
-    @property
-    def description(self) -> str:
-
-        return (
-            "Search uploaded documents for information "
-            "relevant to a user question."
-        )
-
-    async def execute(
+    def execute(
         self,
         question: str,
     ) -> str:
 
-        chunks = self.search.execute(
+        chunks = self.search_service.execute(
             question=question,
         )
 
