@@ -1,6 +1,5 @@
 from langgraph.graph import (
     START,
-    END,
     StateGraph,
 )
 from langgraph.prebuilt import (
@@ -15,10 +14,7 @@ from app.langgraph.nodes.tool_node import (
     tool_node,
 )
 
-
-builder = StateGraph(
-    ChatState,
-)
+builder = StateGraph(ChatState)
 
 builder.add_node(
     "chatbot",
@@ -43,9 +39,4 @@ builder.add_conditional_edges(
 builder.add_edge(
     "tools",
     "chatbot",
-)
-
-builder.add_edge(
-    "chatbot",
-    END,
 )

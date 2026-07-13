@@ -10,7 +10,6 @@ from app.integrations.langchain.tool_factory import (
     ToolFactory,
 )
 from app.schemas.ai import ChatMessage
-from app.schemas.tool_call import ToolCall
 from app.tools.registry import ToolRegistry
 
 
@@ -29,11 +28,9 @@ class LangChainChatModel:
             model=settings.OLLAMA_MODEL,
             base_url=settings.OLLAMA_BASE_URL,
             temperature=0,
-        ).bind_tools(
-            tools,
-        )
+        ).bind_tools(tools)
 
-    async def generate(
+    async def invoke(
         self,
         messages: list[ChatMessage],
     ):
@@ -66,24 +63,6 @@ class LangChainChatModel:
                     )
                 )
 
-        response = await self.model.ainvoke(
+        return await self.model.ainvoke(
             langchain_messages,
         )
-
-        if response.tool_calls:
-
-            tool_calls = []
-
-            for tool in response.tool_calls:
-
-                tool_calls.append(
-                    ToolCall(
-                        id=tool["id"],
-                        name=tool["name"],
-                        arguments=tool["args"],
-                    )
-                )
-
-            return tool_calls
-
-        return response.content

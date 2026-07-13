@@ -1,7 +1,7 @@
-from app.langgraph.state import ChatState
 from app.integrations.langchain.chat_model import (
     LangChainChatModel,
 )
+from app.langgraph.state import ChatState
 
 
 class ChatNode:
@@ -15,7 +15,7 @@ class ChatNode:
         state: ChatState,
     ):
 
-        response = await self.model.model.ainvoke(
+        response = await self.model.invoke(
             state["messages"],
         )
 

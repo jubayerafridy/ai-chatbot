@@ -1,62 +1,63 @@
-import httpx
 from fastapi import HTTPException
+import httpx
 
-from app.integrations.langchain.chat_model import (
-    LangChainChatModel,
-)
 from app.models.message import Message
 from app.prompt.prompt_builder import PromptBuilder
+from app.services.ai.langgraph_service import (
+    LangGraphService,
+)
 
 
 class GenerateResponseService:
 
     def __init__(self):
 
-        self.client = (
-            LangChainChatModel()
-        )
+        self.graph = LangGraphService()
 
-        self.builder = (
-            PromptBuilder()
-        )
+        self.builder = PromptBuilder()
 
     async def execute(
         self,
         messages: list[Message],
+        thread_id: str,
         context: str | None = None,
     ) -> str:
 
-        chat_messages = self.builder.build(
-            messages=messages,
-            context=context,
-        )
+        if not messages:
+            raise HTTPException(
+                status_code=400,
+                detail="Conversation is empty.",
+            )
 
         try:
 
-            return await self.client.generate(
-                messages=chat_messages,
+            prompt = self.builder.build(
+                messages=messages,
+                context=context,
+            )
+
+            return await self.graph.execute(
+                message=prompt[-1].content,
+                thread_id=thread_id,
             )
 
         except httpx.ConnectError:
 
             raise HTTPException(
                 status_code=503,
-                detail="AI service is unavailable.",
+                detail="AI service unavailable.",
             )
 
         except httpx.TimeoutException:
 
             raise HTTPException(
                 status_code=504,
-                detail="AI service timed out.",
+                detail="AI service timeout.",
             )
 
         except httpx.HTTPStatusError as exc:
 
             raise HTTPException(
                 status_code=502,
-                detail=(
-                    f"AI provider returned HTTP "
-                    f"{exc.response.status_code}."
-                ),
+                detail=f"AI provider returned HTTP {exc.response.status_code}.",
             )
