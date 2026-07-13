@@ -9,13 +9,14 @@ from app.schemas.message import (
     MessageCreate,
     SendMessageResponse,
 )
-from app.services.ai.conversation_service import ConversationService
-from app.services.ai.generate_response_service import (
-    GenerateResponseService,
+from app.services.ai.agent_service import (
+    AgentService,
 )
-from app.services.rag.search_documents_service import (
-    SearchDocumentsService,
+
+from app.guardrails.service import (
+    GuardrailService,
 )
+
 
 
 class SendMessageService:
@@ -24,10 +25,12 @@ class SendMessageService:
         self.chat_repository = ChatRepository()
         self.message_repository = MessageRepository()
 
-        self.conversation_service = ConversationService()
-        self.generate_response_service = GenerateResponseService()
-        self.search_documents_service = (
-            SearchDocumentsService()
+
+        self.agent_service = (
+    AgentService()
+)
+
+        self.guardrails = ( GuardrailService()
         )
 
     async def execute(
@@ -53,6 +56,16 @@ class SendMessageService:
                 status_code=404,
                 detail="Chat not found.",
             )
+        
+        # --------------------------
+        # Validate input
+        # --------------------------
+
+        message.content = (
+            self.guardrails.validate_input(
+                message.content,
+            )
+)
 
         # --------------------------
         # Update title on first message
@@ -105,49 +118,15 @@ class SendMessageService:
             raise
 
         # --------------------------
-        # Load conversation history
-        # --------------------------
-
-        messages = (
-            self.conversation_service.execute(
-                db=db,
-                chat_id=chat.id,
-            )
-        )
-
-        # --------------------------
-        # Retrieve relevant documents
-        # --------------------------
-
-        retrieved_chunks = (
-            self.search_documents_service.execute(
-                question=message.content,
-            )
-        )
-
-        context = None
-
-        if retrieved_chunks:
-
-            context = "\n\n".join(
-                (
-                    f"[Document {chunk.document_id}"
-                    f" | Chunk {chunk.chunk_index}]\n"
-                    f"{chunk.content}"
-                )
-                for chunk in retrieved_chunks
-            )
-
-        # --------------------------
         # Generate AI response
         # --------------------------
 
         assistant_text = (
-            await self.generate_response_service.execute(
-                messages=messages,
-                context=context,
-            )
-        )
+    await self.agent_service.execute(
+        message=message.content,
+        thread_id=str(chat.id),
+    )
+)
 
         # --------------------------
         # Save assistant message

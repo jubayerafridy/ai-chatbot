@@ -5,7 +5,9 @@ from app.tools.builtin.calculator import (
 from app.tools.builtin.time import (
     TimeTool,
 )
-
+from app.tools.builtin.retrieval import (
+    RetrievalTool,
+)
 
 class ToolRegistry:
 
@@ -23,6 +25,9 @@ class ToolRegistry:
         self.register(
             TimeTool(),
         )
+        self.register(
+    RetrievalTool(),
+)
 
     def register(
         self,

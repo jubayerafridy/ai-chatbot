@@ -1,5 +1,8 @@
 from app.schemas.tool_call import ToolCall
 from app.tools.registry import ToolRegistry
+from app.security.tool_permissions import (
+    ToolPermissionService,
+)
 
 
 class ToolRunner:
@@ -7,6 +10,10 @@ class ToolRunner:
     def __init__(self):
 
         self.registry = ToolRegistry()
+
+        self.permissions = (
+            ToolPermissionService()
+        )
 
     async def run(
         self,
@@ -22,6 +29,11 @@ class ToolRunner:
             raise ValueError(
                 f"Unknown tool: {tool_call.name}"
             )
+
+        # Permission check
+        self.permissions.validate(
+            tool_call.name,
+        )
 
         result = await tool.execute(
             **tool_call.arguments,
