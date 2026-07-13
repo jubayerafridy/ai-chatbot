@@ -13,12 +13,15 @@ class LangChainChatModel:
 
         registry = ToolRegistry()
 
+        tools = registry.list()
+
+
         self.model = ChatOllama(
             model=settings.OLLAMA_MODEL,
             base_url=settings.OLLAMA_BASE_URL,
             temperature=0,
         ).bind_tools(
-            registry.list(),
+            tools,
         )
 
     async def invoke(

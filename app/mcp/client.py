@@ -1,20 +1,16 @@
-class MCPClient:
+from langchain_mcp_adapters.client import (
+    MultiServerMCPClient,
+)
 
-    def __init__(self):
 
-        self.servers = []
-
-    def register(
-        self,
-        server,
-    ):
-
-        self.servers.append(
-            server,
-        )
-
-    def list_servers(
-        self,
-    ):
-
-        return self.servers
+client = MultiServerMCPClient(
+    {
+        "local": {
+            "command": "python",
+            "args": [
+                "app/mcp/servers/local_server.py",
+            ],
+            "transport": "stdio",
+        }
+    }
+)
