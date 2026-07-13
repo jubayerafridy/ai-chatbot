@@ -6,12 +6,18 @@ from app.models.document import (
     Document,
     DocumentStatus,
 )
+from app.models.document_chunk import (
+    DocumentChunk,
+)
 from app.rag.loaders.pdf_loader import PDFLoader
 from app.rag.splitters.text_splitter import (
     TextSplitter,
 )
 from app.repositories.document_chunk_repository import (
     DocumentChunkRepository,
+)
+from app.services.rag.vector_index_service import (
+    VectorIndexService,
 )
 
 
@@ -31,6 +37,10 @@ class ProcessDocumentService:
             DocumentChunkRepository()
         )
 
+        self.vector_index_service = (
+            VectorIndexService()
+        )
+
     def execute(
         self,
         db: Session,
@@ -43,20 +53,26 @@ class ProcessDocumentService:
 
         db.commit()
 
-        pdf_path = (
+        document_path = (
             self.STORAGE_DIRECTORY
             / document.stored_filename
         )
 
         text = self.loader.load(
-            pdf_path,
+            document_path,
         )
 
         chunks = self.splitter.split(
             text,
         )
 
-        for index, chunk in enumerate(chunks):
+        saved_chunks: list[
+            DocumentChunk
+        ] = []
+
+        for index, chunk in enumerate(
+            chunks,
+        ):
 
             entity = (
                 self.chunk_repository.create(
@@ -66,7 +82,25 @@ class ProcessDocumentService:
                 )
             )
 
-            db.add(entity)
+            db.add(
+                entity,
+            )
+
+            saved_chunks.append(
+                entity,
+            )
+
+        db.commit()
+
+        for chunk in saved_chunks:
+
+            db.refresh(
+                chunk,
+            )
+
+        self.vector_index_service.index_chunks(
+            saved_chunks,
+        )
 
         document.status = (
             DocumentStatus.READY

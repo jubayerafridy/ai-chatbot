@@ -11,25 +11,52 @@ class RetrievalService:
             SearchDocumentsService()
         )
 
+    # def execute(
+    #     self,
+    #     question: str,
+    # ) -> str:
+
+    #     chunks = self.search_service.execute(
+    #         question=question,
+    #     )
+
+    #     if not chunks:
+
+    #         return (
+    #             "No relevant documents found."
+    #         )
+
+    #     return "\n\n".join(
+
+    #         chunk.content
+
+    #         for chunk in chunks
+
+    #     )
+    
     def execute(
         self,
         question: str,
     ) -> str:
 
+        print("=" * 60)
+        print("QUESTION:", question)
+
         chunks = self.search_service.execute(
             question=question,
         )
 
-        if not chunks:
+        print("CHUNKS FOUND:", len(chunks))
 
-            return (
-                "No relevant documents found."
-            )
+        for chunk in chunks:
+            print(chunk.content)
+
+        print("=" * 60)
+
+        if not chunks:
+            return "No relevant documents found."
 
         return "\n\n".join(
-
             chunk.content
-
             for chunk in chunks
-
         )
