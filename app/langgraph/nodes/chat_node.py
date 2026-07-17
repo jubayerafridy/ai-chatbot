@@ -4,6 +4,9 @@ from app.integrations.langchain.chat_model import (
 from app.langgraph.state import (
     ChatState,
 )
+from app.prompts.manager import (
+    prompt_manager,
+)
 
 
 class ChatNode:
@@ -15,10 +18,15 @@ class ChatNode:
 
         model = LangChainChatModel()
 
-        response = await model.invoke(
-            state["messages"],
+        messages = (
+            prompt_manager.build_messages(
+                state["messages"],
+            )
         )
 
+        response = await model.invoke(
+            messages,
+        )
 
         return {
             "messages": [
