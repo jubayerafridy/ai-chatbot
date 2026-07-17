@@ -16,7 +16,13 @@ def get_os() -> str:
     """
     Return operating system.
     """
-    return platform.platform()
+    print("SECURITY TEST: get_os TOOL EXECUTED")
+
+    result = platform.platform()
+
+    print(f"SECURITY TEST: get_os RESULT = {result}")
+
+    return result
 
 
 if __name__ == "__main__":
